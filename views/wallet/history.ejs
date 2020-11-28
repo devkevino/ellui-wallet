@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI - Wallet</title>
+    <meta name="viewport" 
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+</head>
+<body class="menu pushable">
+
+<%- include('../layout/page-info'); -%> 
+
+<%- include('../layout/sidebar'); -%> 
+
+<div class="pusher">
+    
+    <%- include('../layout/topbar'); -%> 
+
+    <div class="main">
+        <div class="title_area withBtns">
+            <h2 class="ui header">
+                History
+                <div class="sub header">
+                    My Address Transction History
+                </div>
+            </h2>
+            <div class="ui download primary button" onclick="location.href = '/wallet/history';">
+                Refresh
+            </div>
+        </div>
+
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>TxHash</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+                <tr>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                    <td><span style="color:white">-</span></td>
+                </tr>
+
+            </tbody>
+            <tfoot>
+                <tr><th colspan="5">
+                <div id="page_area" class="ui right floated pagination menu">
+                    <a class="icon item disabled">
+                        <i class="left chevron icon"></i>
+                    </a>
+                    <a class="icon item disabled">
+                        <i class="right chevron icon"></i>
+                    </a>
+                </div>
+                </th>
+            </tr></tfoot>
+        </table>
+
+    </div>
+</div>
+
+<script src="/javascripts/jquery-3.3.1.min.js"></script>
+<script src="/semantic/semantic.js"></script>
+<script src="/javascripts/common.js"></script>
+<script src="/javascripts/pagination.js"></script>
+
+<script>
+var appkey = 'UI8RQ3DQJT8PM38GA5Q3SHUYB4F3I7RD41';
+var contractAddress = '0x1977eF284cB4644eabF2010a1D7Efd28a9AF89b9';
+//var address = '0xecdad483d3d65f2097407485ba1ee687041159f8';
+var address = "<%= address%>";
+console.warn('appkey', appkey);
+console.warn('address', address);
+
+var offset; // 한화면에 출력 될 데이터 갯수
+var totalCount; // 전체 데이터 갯수
+
+var page; // 현재 페이지 번호
+var pageCount; // 한화면에 출력 될 페이지 수
+var pageTotalCount; // 전체 페이지 수
+
+$(document).ready(function() {
+    initPage();
+});
+
+function getHistoryListURL(page, offset) {
+    
+    var url = 'https://api.etherscan.io/api?module=account&action=tokentx';
+    url = url.concat('&contractaddress=', contractAddress);
+    url = url.concat('&address=', address);
+    url = url.concat('&startblock=0', '&endblock=99999999');
+    url = url.concat('&page=', page);
+    url = url.concat('&offset=', offset);
+    url = url.concat('&sort=', 'desc');
+    url = url.concat('&apikey=', appkey);
+    return url;
+}
+
+function getHistoryCountURL(page) {
+
+    var url = 'https://api.etherscan.io/api?module=account&action=tokentx';
+    url = url.concat('&contractaddress=', contractAddress);
+    url = url.concat('&address=', address);
+    url = url.concat('&startblock=0', '&endblock=99999999');
+    url = url.concat('&page=', page);
+    url = url.concat('&offset=999999999');
+    url = url.concat('&sort=', 'asc');
+    url = url.concat('&apikey=', appkey);
+    return url;
+}
+
+function initPage() {
+
+    offset = 10; // 한화면에 출력 될 데이터 갯수
+    totalCount = 0; // 전체 데이터 갯수
+    
+    page = 1; // 현재 페이지 번호
+    pageCount = 5; // 한화면에 출력 될 페이지 수
+    pageTotalCount = 0; // 전체 페이지 수
+
+    getApiData(getHistoryCountURL(), 'count', setPages);
+    getApiData(getHistoryListURL(1, offset), 'list', setList);
+
+}
+
+function getApiData(url, type, callback) {
+    $.ajax({
+        url: url,
+    })
+    .done(function( msg ) {
+        window.dummy = msg;
+        if(msg.hasOwnProperty('error')) {
+            alert(JSON.stringify(msg.error));
+        } else if(msg.hasOwnProperty('result')) {
+            if(type === 'count') {
+                if(typeof callback === 'function') {
+
+                    var data_count = Number(msg.result.length);
+                    console.warn('data_count', data_count);
+                    callback(data_count);
+                }
+    
+            } else if(type === 'list') {
+                //alert(msg.result.length);
+                var datas = msg.result;
+                callback(datas);
+            } else {
+                console.warn(msg.result);
+            }
+        } else {
+            alert(msg);
+        }
+    });
+}
+
+
+function setPages(count) {
+    totalCount = count;
+    pageTotalCount = getPageTotalCount(totalCount, offset);
+
+    var startPage = getStartPage();
+    var endPage = getEndPage(startPage);
+
+    var pageHTML = getPageHTML(startPage, endPage);
+    $("#page_area").html(pageHTML);
+
+    $("#page_area > a").click(function(e){
+
+        $("#page_area > a").removeClass('active')
+
+        var page_num = parseInt($(this).attr('page'));
+        if (page_num) {
+
+            page = page_num; 
+            
+            // page 다시 그릴 필요 체킹
+            var opt = $(this).attr('remake_pagination');
+            if(opt) {
+                // 페이지 다시 그리기
+                setPages(totalCount);
+            } 
+            $(this).addClass('active');
+            
+            // 페이지 데이터 받아오기...
+            getApiData(getHistoryListURL(page_num, offset), 'list', setList);
+            
+        }
+    });
+
+}
+
+function getPageTotalCount(totalCount, offset) {
+    var pageTotalCount = totalCount / offset;
+    pageTotalCount = Math.ceil(pageTotalCount);
+    return pageTotalCount;
+}
+
+function getStartPage() {
+    var startPage = (page - 1) / pageCount;
+    startPage = Math.floor(startPage);
+    startPage = (startPage * pageCount) + 1;
+    return startPage;
+}
+
+function getEndPage(startPage) {
+    var endPage = startPage + pageCount - 1;
+    if(pageTotalCount  < endPage) {
+        endPage = pageTotalCount;
+    }
+    return endPage;
+}
+
+function getPageHTML(startPage, endPage) {
+    var html = "";
+    // 이전버튼
+    var prev_btn;
+    var prev_page = startPage - 1;
+    if(offset < startPage) {
+        prev_btn = '<a page='+prev_page+' class="icon item" remake_pagination="true">\
+                        <i class="left chevron icon"></i>\
+                    </a>'; 
+    } else {
+        prev_btn = '<a class="icon item disabled">\
+                        <i class="left chevron icon"></i>\
+                    </a>'; 
+    }
+
+    // 페이지 버튼
+    var page_btns = "";
+    var current_page = page;
+    console.warn("current_page", current_page, typeof current_page);
+    for(var i = startPage; i <= endPage; i++){
+        var page_num = i;
+        var btn_class = (current_page === page_num) ? 'item active' : 'item';
+        console.warn('btn_class', btn_class);
+        var page_html = '<a page='+page_num+' class="'+btn_class+'">'+page_num+'</a>'; 
+        page_btns = page_btns.concat(page_html);
+
+    }
+
+    // 다음버튼
+    var next_btn;
+    var next_page = endPage + 1;
+    if(endPage < pageTotalCount) {
+        next_btn = '<a page='+next_page+' class="icon item" remake_pagination="true">\
+                        <i class="right chevron icon"></i>\
+                    </a>';
+    } else {
+        next_btn = '<a class="icon item disabled">\
+                        <i class="right chevron icon"></i>\
+                    </a>';  
+    }
+
+    html = html.concat(prev_btn);
+    html = html.concat(page_btns);
+    html = html.concat(next_btn);
+    
+    return html;
+
+}
+
+
+function setList(datas) {
+
+    window.rows = $("#historyTable > tr");
+
+    for(var i = 0; i < datas.length; i++) {
+        var row = rows[i];
+        var tds = $(row).children();
+        
+        var data = datas[i];
+        var time = timeStampToString(data.timeStamp);
+
+        var hash = data.hash ? data.hash.substring(0, 16) + '...' : data.hash;
+        var from = data.from ? data.from.substring(0, 16) + '...' : data.from;
+        var to = data.to ? data.to.substring(0, 16) + '...' : data.to;
+        var value = data.value/(10**18);
+
+        $(tds[0]).text(time);
+        $(tds[1]).html('<a href="#'+data.hash+'">'+hash+'</a>');
+        $(tds[2]).html('<a href="#'+data.from+'">'+from+'</a>');
+        $(tds[3]).html('<a href="#'+data.to+'">'+to+'</a>');
+        $(tds[4]).text(value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+    }
+
+    for(var i = datas.length; i < rows.length; i++) {
+        var row = rows[i];
+        var tds = $(row).children();
+        $(tds).html('<span style="color:white">-</span>');
+    }
+}
+
+function timeStampToString(timeStamp) {
+    var a = new Date(timeStamp * 1000);
+    var year = a.getFullYear();
+    var month = a.getMonth() + 1; month = (month < 10) ? '0'+month : month;
+    var date = a.getDate(); date = (date < 10) ? '0'+date : date;
+    var hour = a.getHours(); hour = (hour < 10) ? '0'+hour : hour;
+    var min = a.getMinutes(); min = (min < 10) ? '0'+min : min;
+    var sec = a.getSeconds(); sec = (sec < 10) ? '0'+sec : sec;
+    var time = year + '-' + month + '-' + date + ' ' + hour + ':' + min + ':' + sec ;
+    return time;
+
+}
+
+
+</script>
+
+</body>
+</html>

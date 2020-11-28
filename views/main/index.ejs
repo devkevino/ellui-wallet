@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI - Wallet</title>
+    <meta name="viewport" 
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+</head>
+<body class="menu pushable">
+
+<%- include('../layout/page-info'); -%> 
+
+<%- include('../layout/sidebar'); -%> 
+
+<div class="pusher">
+    
+    <%- include('../layout/topbar'); -%> 
+
+    <div class="main">
+        <div class="title_area">
+            <h2 class="ui header">
+                ELLUI.io
+                <div class="sub header">
+                    Ellui Token infomation
+                </div>
+            </h2>
+        </div>
+        
+        <div class="index_area"> 
+            <h1>Welcome to ELLUI.io</h1>
+            <h4>Interact with the Ellui blockchain easily & securely. Double-check the URL ( .io) before unlocking your wallet.
+                    2018 ElluiWallet</h4>
+
+            <div class="ui tiny red statistic">My Ellui : 
+                <div class="value">
+                <%=erc_balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> ELU
+                </div>
+            </div>
+            <br>
+            <div class="ui mini gray statistic">My Ether : 
+                <div class="value">
+                <%=eth_balance%> ETH
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <div id="token-history-grouped-1"></div>
+            <script type="text/javascript">
+            if (typeof (eWgs) === 'undefined') {
+                document.write('<scr' + 'ipt src="https://api.ethplorer.io/widget.js?' + new Date().getTime().toString().substr(0, 7) + '" async></scr' + 'ipt>');
+                var eWgs = [];
+            }
+            eWgs.push(function () {
+                ethplorerWidget.init(
+                    '#token-history-grouped-1', // Placeholder element
+                    'tokenHistoryGrouped', // Widget type
+                    {
+                        // token address
+                        'address': '0x358b2f19bcbad11e1e076247df5552c2a5f0272c',
+                        options: {
+                            'title': 'Ellui Activity Chart',
+                            'pointSize': 5,
+                            'vAxis': {
+                                'title': 'Token operations',
+                            }
+                        }
+                    }
+            
+                );
+            });
+            </script>    
+
+        </div>
+
+    </div>
+</div>
+
+<script src="/javascripts/jquery-3.3.1.min.js"></script>
+<script src="/semantic/semantic.js"></script>
+<script src="/javascripts/common.js"></script>
+</body>
+</html>

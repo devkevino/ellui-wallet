@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI - Wallet</title>
+    <meta name="viewport" 
+    content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+    <script src="/javascripts/jquery-3.3.1.min.js"></script>
+
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+    <link rel="stylesheet" href='/semantic/semantic-UI/Semantic-UI-Alert.css'>
+</head>
+<body class="login_body">
+
+<header>
+    <div class="title">
+        <!--<span>ELLUI</span>-->
+    </div>
+</header>
+
+<loginBody>
+    <div class="container">
+        <img class="logo_image" src="/images/logo.png" alt="logos">
+        <p class="title">ELLUI Wallet</p>
+        <div class="div-row">
+            <button id="select_file_btn" class="ui fluid big basic button" onclick="openFileDialog()">
+                <i class="icon file outline"></i>
+                Select Wallet File
+            </button>
+            <p id="file_msg" class="error_next_text">Please select a keystore file.</p>
+            <p id="file_name" style="display: none; margin-top: 5px;"></p>
+            <input id="keystore" name="keystore" type="file" style="display: none;">
+        </div>
+        <div class="div-row">
+            <div class="ui fluid big input">
+                <input id="pwd" type="password" placeholder="Password">
+            </div>
+            <p id="pwd_msg" class="error_next_text">Please enter your password.</p>
+        </div>      
+        <div class="div-row">
+            <button class="ui fluid big basic button" onclick="signIn()">
+                <i class="icon sign in"></i>
+                Sign in
+            </button>
+        </div>
+        <div class="div-row">
+             <a href="/user/register">Create New Account</a>
+        </div>
+    </div>
+</loginBody>
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<script src='/semantic/semantic-UI/Semantic-UI-Alert.js'></script>
+
+<script>
+
+$(document).ready(function() {
+
+    $("#keystore").on('change', function() {
+
+        var files = this.files;
+
+        $("#file_msg").css('display', 'none');
+        $("#file_name").text("file : "+files[0].name).css('display', 'block');
+    });
+
+});
+
+$("#pwd").blur(function() {
+    check_PWD();
+});
+
+function check_PWD() {
+    var pwd = $('#pwd').val();
+    if(!pwd) {
+        $('#pwd').closest('.ui.fluid.big.input').addClass('error');
+        $("#pwd_msg").css('display', 'block');
+        return false;
+    } else {
+        $('#pwd').closest('.ui.fluid.big.input').removeClass('error');
+        $("#pwd_msg").css('display', 'none')
+        return pwd;
+    }
+}
+
+function signIn() {
+
+    var pwd = check_PWD();
+    var file = $("#keystore").val();
+
+    if(pwd && file) {
+        // location.href = '/index';
+
+        $('#loader').fadeIn();
+
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.enctype = 'multipart/form-data';
+    
+        var formData = new FormData(form);
+        formData.append('pwd', pwd);
+        formData.append('keystore', document.getElementById('keystore').files[0]);
+        
+        $.ajax({
+            method: "POST",
+            url: "/user/login",
+            processData: false,
+            contentType: false, 
+            data: formData,
+        })
+        .done(function( msg ) {
+            if(msg.result) {
+                location.href = '/';
+            } else {
+                $.uiAlert({
+                    textHead: 'Sign in Failed', // header
+                    text: msg.message, // Text
+                    bgcolor: '#F2711C', // background-color
+                    textcolor: '#fff', // color
+                    position: 'bottom-center',// position . top And bottom ||  left / center / right
+                    icon: 'warning sign', // icon in semantic-UI
+                    time: 10, // time
+                })
+                $('#loader').fadeOut();
+            }
+            
+        })
+        .fail(function() {
+            alert( "request error" );
+            $('#loader').fadeOut();
+        });
+
+    } else {
+        if(!file) {
+            $("#file_msg").css('display', 'block');
+        }
+    }
+   
+}
+
+function openFileDialog() {
+    $("#keystore").click();
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI - Wallet</title>
+    <meta name="viewport" 
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+    <link rel="stylesheet" href='/semantic/semantic-UI/Semantic-UI-Alert.css'>
+</head>
+<body class="menu pushable">
+
+<%- include('../layout/page-info'); -%> 
+
+<%- include('../layout/sidebar'); -%> 
+
+<div class="pusher">
+    
+    <%- include('../layout/topbar'); -%> 
+
+    <div class="main">
+        <div class="title_area">
+            <h2 class="ui header">
+                Send Transaction
+                <div class="sub header">
+                    Send ELU token
+                </div>
+            </h2>
+        </div>
+
+        <div class="ui segment content_area">
+            <form class="ui form">
+                <div class="field">
+                    <label>To Address</label>
+                    <input id="toAddress" type="text" placeholder="0x..">
+                    <p id="toAddress_msg" class="error_next_text">Receiver Adress..</p>
+                </div>
+                <div class="field">
+                    <label>Token</label>
+                    <div id="tokenType" class="ui selection dropdown">
+                            <div class="text"></div>
+                            <i class="dropdown icon"></i>
+                    </div>
+                </div>
+                <p class="balance">Balance : <span id="balance">0</span></p>
+                <div class="field">
+                    <label>Amount</label>
+                    <input id="amount" class="no-spinners" type="number" placeholder="Amount to send">
+                    <p id="amount_msg" class="error_next_text">Please check the quantity value.</p>
+                    <p id="amount_msg2" class="error_next_text">Quantity value is negative.</p>
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input id="password" type="password" placeholder="Your password">
+                    <p id="password_msg" class="error_next_text">Please enter your password.</p>
+                </div>
+                <button onclick="send(event)" class="ui fluid button" type="button">Send</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="/javascripts/jquery-3.3.1.min.js"></script>
+<script src="/semantic/semantic.js"></script>
+<script src="/javascripts/common.js"></script>
+<script src='/semantic/semantic-UI/Semantic-UI-Alert.js'></script>
+
+<script>
+$('#tokenType').dropdown({
+    values: [
+        {
+            name: 'ETH',
+            value: 'eth'
+        },
+        {
+            name     : 'ELU',
+            value    : 'erc',
+            selected : true
+        }
+    ],
+    onChange: function(value, text) {
+        getBalance(value);
+    }
+});
+
+function getBalance(value) {
+    $.ajax({
+        method: "post",
+        url: "/wallet/send/balance",
+        data: {
+            type : value,
+        }
+    })
+    .done(function( msg ) {
+        $("#balance").text(msg.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+    });
+}
+
+function send(event) {
+    event.preventDefault;
+
+    var toAddress = check_validate('toAddress');
+    var amount = check_validate('amount');
+    var password = check_validate('password');
+
+    if(toAddress && amount && password) {
+        var obj = {};
+        obj.toAddress = $("#toAddress").val();
+        obj.type = $('#tokenType').dropdown('get value');
+        obj.amount = $("#amount").val();
+        obj.password = $("#password").val();
+
+        $.ajax({
+            method: "post",
+            url: "/wallet/send",
+            data: obj,
+        })
+        .done(function( msg ) {
+            var str = "Send "+msg.result+ " - "+msg.message;
+            if(msg.result){
+                $.uiAlert({
+                    textHead: 'Send successful Amount : '+obj.amount, // header
+                    text: 'tx : '+msg.message, // Text
+                    bgcolor: '#19c3aa', // background-color
+                    textcolor: '#fff', // color
+                    position: 'bottom-center',// position . top And bottom ||  left / center / right
+                    icon: 'checkmark box', // icon in semantic-UI
+                    time: 5, // time
+                })
+            }else{
+                $.uiAlert({
+                    textHead: 'Send failed', // header
+                    text: msg.message, // Text
+                    bgcolor: '#F2711C', // background-color
+                    textcolor: '#fff', // color
+                    position: 'bottom-center',// position . top And bottom ||  left / center / right
+                    icon: 'warning sign', // icon in semantic-UI
+                    time: 5, // time
+                })
+            }
+            
+            $("#toAddress").val('');
+            $("#amount").val('');
+            $("#password").val('');
+        })
+        .fail(function() {
+            $.uiAlert({
+                textHead: "Send Error", // header
+                text: 'Request Error', // Text
+                bgcolor: '#DB2828', // background-color
+                textcolor: '#fff', // color
+                position: 'bottom-center',// position . top And bottom ||  left / center / right
+                icon: 'remove circle', // icon in semantic-UI
+                time: 5, // time
+            })
+        });;
+
+    } else {
+        console.warn('check your validate!!');
+    }
+
+}
+
+$(".content_area input").blur(function() {
+    var tag_id = $(this).attr('id');
+    check_validate(tag_id);
+
+});
+
+function check_validate(tag_id) {
+    var id_str = '#'+tag_id;
+    
+    if(!$(id_str).val()) {
+        $(id_str+'_msg').css('display', 'block');
+        $(id_str+'_msg2').css('display', 'none');
+        $(id_str).closest('.field').addClass('error');
+        return false;
+    } else {
+        if(tag_id === 'amount') {
+            var amount = $(id_str).val();
+            if(amount < 0) {
+                $(id_str+'_msg').css('display', 'none');
+                $(id_str+'_msg2').css('display', 'block');
+                $(id_str).closest('.field').addClass('error');
+
+                return false;
+            } else {
+                $(id_str+'_msg').css('display', 'none');
+                $(id_str+'_msg2').css('display', 'none');
+                $(id_str).closest('.field').removeClass('error');
+                return true;
+            }
+        } else {
+            $(id_str+'_msg').css('display', 'none');
+            $(id_str).closest('.field').removeClass('error');
+            return true;
+        }
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

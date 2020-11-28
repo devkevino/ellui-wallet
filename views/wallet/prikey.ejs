@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI - Wallet</title>
+    <meta name="viewport" 
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+    <link rel="stylesheet" href='/semantic/semantic-UI/Semantic-UI-Alert.css'>
+</head>
+<body class="menu pushable">
+
+<%- include('../layout/page-info'); -%> 
+
+<%- include('../layout/sidebar'); -%> 
+
+<div class="pusher">
+    
+    <%- include('../layout/topbar'); -%> 
+
+    <div class="main">
+        <div class="title_area">
+            <h2 class="ui header">
+                Private Key
+                <div class="sub header">
+                    My wallet is Private key
+                </div>
+            </h2>
+        </div>
+
+        <div class="ui segment content_area">
+            <form class="ui form">
+                <div class="field">
+                    <label>My Private Key</label>   
+                    <div class="ui action fluid input">
+                        <input id="prikey" type="text" value="<%= prikey%>" readonly>
+                        <button class="ui teal right labeled icon button" onclick="copy_to_clipboard(event)">
+                            <i class="copy icon"></i>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+             </form>
+
+        </div>
+
+        <div class="ui segment content_area qrcode">
+            <div class="qrcode_box">
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="/javascripts/jquery-3.3.1.min.js"></script>
+<script src="/semantic/semantic.js"></script>
+<script src="/javascripts/common.js"></script>
+<script src="/javascripts/jquery-qrcode-0.14.0.js"></script>
+<script src='/semantic/semantic-UI/Semantic-UI-Alert.js'></script>
+
+<script>
+
+let prikey = '<%= prikey %>'; 
+
+function copy_to_clipboard(event) {
+    event.preventDefault();
+
+    var copyText = document.getElementById("prikey");
+    copyText.select();
+    document.execCommand("Copy");
+
+    $.uiAlert({
+        textHead: 'Copied to clipboard.', // header
+        text: prikey, // Text
+        bgcolor: '#19c3aa', // background-color
+        textcolor: '#fff', // color
+        position: 'bottom-center',// position . top And bottom ||  left / center / right
+        icon: 'checkmark box', // icon in semantic-UI
+        time: 50, // time
+    })
+    
+}
+
+const qrcodeOptions = {
+    // render method: 'canvas', 'image' or 'div'
+    render: 'canvas',
+
+    // version range somewhere in 1 .. 40
+    minVersion: 1,
+    maxVersion: 40,
+
+    // error correction level: 'L', 'M', 'Q' or 'H'
+    ecLevel: 'L',
+
+    // offset in pixel if drawn onto existing canvas
+    left: 0,
+    top: 0,
+
+    // size in pixel
+    size: 500,
+
+    // code color or image element
+    fill: '#000',
+
+    // background color or image element, null for transparent background
+    background: null,
+
+    // content
+    text: prikey,
+
+    // corner radius relative to module width: 0.0 .. 0.5
+    radius: 0,
+
+    // quiet zone in modules
+    quiet: 0,
+
+    // modes
+    // 0: normal
+    // 1: label strip
+    // 2: label box
+    // 3: image strip
+    // 4: image box
+    mode: 0,
+
+    mSize: 0.1,
+    mPosX: 0.5,
+    mPosY: 0.5,
+
+    label: 'no label',
+    fontname: 'sans',
+    fontcolor: '#000',
+
+    image: null
+};
+$('.qrcode_box').qrcode(qrcodeOptions);
+
+</script>
+
+</body>
+</html>

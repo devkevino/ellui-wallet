@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI - Wallet</title>
+    <meta name="viewport" 
+        content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+</head>
+<body class="menu pushable">
+
+<%- include('../layout/page-info'); -%> 
+
+<%- include('../layout/sidebar'); -%> 
+
+<div class="pusher">
+    
+    <%- include('../layout/topbar'); -%> 
+
+    <div class="main">
+        <div class="title_area">
+            <h2 class="ui header">
+                <!-- 12,345,678 ELI -->
+                <%=erc_balance %> ELI
+                <div class="sub header">
+                    <!-- 0.00001 ETH -->
+                    <%=eth_balance %> ETH
+                </div>
+            </h2>
+        </div>
+        
+        <div class="index_area"> 
+                
+            <img class="logo_image" src="/images/logo.png" alt="logos">
+
+            <div class="info_contents">
+                <h2 class="ui header">
+                    Name
+                    <div class="sub header">
+                        ELLUI
+                    </div>
+                </h2>
+                <h2 class="ui header">
+                    Symbol
+                    <div class="sub header">
+                        ELI
+                    </div>
+                </h2>
+                <h2 class="ui header">
+                    TotalSupply
+                    <div class="sub header">
+                       2,500,000,000 ELI
+                    </div>
+                </h2>
+                <h2 class="ui header">
+                    Desimals
+                    <div class="sub header">
+                       6
+                    </div>
+                </h2>
+            </div>                   
+
+            <!-- <div class="logo_area">
+                <img class="logo_image" src="/images/logo.png" alt="logos">
+            </div>
+
+            <div class="info_area">
+                <div class="info_contents">
+                    <h2 class="ui header">
+                        ELLUI (ELI)
+                        <div class="sub header">
+                            ERC20 표준 토큰
+                        </div>
+                    </h2>
+                    <h2 class="ui header">
+                            총 발행량
+                        <div class="sub header">
+                            2,500,000,000 ELI
+                        </div>
+                    </h2>
+                </div>                   
+            </div> -->
+
+        </div>
+
+    </div>
+</div>
+
+<script src="/javascripts/jquery-3.3.1.min.js"></script>
+<script src="/semantic/semantic.js"></script>
+<script src="/javascripts/common.js"></script>
+</body>
+</html>

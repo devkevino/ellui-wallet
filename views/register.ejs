@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ELLUI</title>
+    <meta name="viewport" 
+    content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel='stylesheet' href='/stylesheets/common.css'/>
+    <link rel='stylesheet' href='/stylesheets/login.css'/>
+    <link rel='stylesheet' href='/semantic/semantic.css'/>
+    <script src="/javascripts/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="title">
+        <span>ELLUI</span>
+    </div>
+</header>
+
+<loginBody>
+    <div id="createArea" class="container">
+        <h2>Create New Wallet</h2>
+        <div class="div-row">
+            <div class="ui fluid big input">
+                <input id="pwd" type="password" placeholder="Password">
+            </div>
+            <p id="pwd_msg" class="error_next_text">Please enter your password.</p>
+            <div class="ui fluid big input" style="margin-top: 15px;">
+                <input id="pwd2" type="password" placeholder="Confirm Password">
+            </div>
+            <p id="pwd2_msg" class="error_next_text">Please enter your password again.</p>
+        </div>      
+        <div class="div-row">
+            <button id="createBtn" class="ui fluid huge basic button">
+                <i class="file outline icon"></i>
+                Create
+            </button>
+        </div>
+        <div class="div-row">
+             <a href="/user/login">Go to Sign in page</a>
+        </div>
+    </div>
+    <div id="saveArea" class="container" style="display: none;">
+        <h2>Save your Keystore File.</h2>     
+        <div class="div-row">
+            <a id="downloadBtn" class="ui fluid huge basic button"  href="#" download="fName">
+                <i class="download icon"></i>
+                Download Keystore File
+            </a>
+        </div>
+        <div class="div-row">
+            <p><span style="background-color:yellow">It can not be recovered if you lose it.</span></p>
+            <p><span style="background-color:yellow">Your funds will be stolen if you use this file on a malicious / phishing site.</span></p>
+            <p><span style="background-color:yellow">Secure it like the millions of dollars it may one day be worth.</span></p>
+        </div>
+        <div class="div-row">
+            <a id="loginPageBtn" class="ui fluid huge basic disabled button"  href="/login">
+                <i class="icon sign in"></i>
+                Go to Sign in page
+            </a>
+        </div>
+    </div>
+</loginBody>
+
+<script>
+
+$("#createBtn").click(function(event) {
+
+    var check_pwd = check_PWD();
+    var check_pwd2 = check_PWD_confirm();
+
+    if(check_pwd && check_pwd2) {
+
+        let pwd = $("#pwd").val();
+        $.ajax({
+            method: "post",
+            url: "/user/register",
+            data: {
+                password : pwd,
+            }
+        })
+        .done(function( msg ) {
+            if(msg.result === true) {
+                $("#createArea").hide();
+                $("#saveArea").show();
+
+                var blob = new Blob([msg.fcontent], {type : 'text/plain'});
+                var url = URL.createObjectURL(blob);
+                
+                $('#downloadBtn').attr("href", url).attr("download", msg.fname);
+
+                $('#downloadBtn').off();
+                $('#downloadBtn').click((event) => {
+                    $('#loginPageBtn').removeClass('disabled');
+                });
+                
+            } else {
+                alert('Create FAIL ERROR!');           
+            }
+        });
+
+    }
+});
+
+$("#pwd").blur(function() {
+    check_PWD();
+});
+function check_PWD() {
+    var pwd = $('#pwd').val();
+    if(!pwd) {
+        $('#pwd').closest('.ui.fluid.big.input').addClass('error');
+        $("#pwd_msg").css('display', 'block').text('Required information.');
+        return false;
+    }
+
+    // 8 ~ 16 자, 특수문자 : # ? ! @ $ % ^ & * -
+    var check = pwd.match(/^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$/);
+
+    if(!check) {
+        $('#pwd').closest('.ui.fluid.big.input').addClass('error');
+        $("#pwd_msg").css('display', 'block').text('Use 8 ~ 16 letters, numbers, and special characters (#?! @ $% ^ & * -)');
+        return false;
+    } else {
+        $('#pwd').closest('.ui.fluid.big.input').removeClass('error');
+        $("#pwd_msg").css('display', 'none')
+        return true;
+    }
+}
+
+$("#pwd2").blur(function() {
+    check_PWD_confirm();
+});
+function check_PWD_confirm() {
+    var pwd = $('#pwd').val();
+    var pwd2 = $('#pwd2').val();
+
+    if(!pwd2) {
+        $('#pwd2').closest('.ui.fluid.big.input').addClass('error');
+        $("#pwd2_msg").css('display', 'block').text('Required information.');
+        return false;
+    }
+
+    if(pwd !== pwd2) {
+        $('#pwd2').closest('.ui.fluid.big.input').addClass('error');
+        $("#pwd2_msg").css('display', 'block').text('Passwords do not match.');
+    } else {
+        $('#pwd2').closest('.ui.fluid.big.input').removeClass('error');
+        $("#pwd2_msg").css('display', 'none')
+        return true;
+    }
+
+}
+
+</script>
+</body>
+</html>
